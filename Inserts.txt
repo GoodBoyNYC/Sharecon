@@ -1,0 +1,111 @@
+##Llubomir Stanojlovic
+
+###### Part A
+
+##1
+###SallySmith
+INSERT INTO person (p_id, password, fname, lname)
+VALUES ('SS', md5('SS'), 'Sally', 'Smith');
+
+###Bob Boxer
+INSERT INTO person (p_id, password, fname, lname)
+VALUES ('BB', md5('BB'), 'Bob', 'Boxer');
+
+###Mary Magee
+INSERT INTO person (p_id, password, fname, lname)
+VALUES ('MM', md5('MM'), 'Mary', 'Magee');
+
+###Ann Andrews
+INSERT INTO person (p_id, password, fname, lname)
+VALUES ('AA', md5('AA'),  'Ann', 'Andrews');
+
+##2
+INSERT INTO content (c_id, c_text, privacy, owner_id, p_time)
+VALUES (1, 'My favorite restaurant', 0, 'SS', NOW());
+INSERT INTO topic (c_id, topic)
+VALUES (1, 'restaurants');
+
+##3
+INSERT INTO rate (p_id, c_id, rate)
+VALUES ('SS', 1, 2);
+INSERT INTO rate (p_id, c_id, rate)
+VALUES ('AA', 1, 0);
+
+##4
+INSERT INTO circle (owner_id, circle_name)
+VALUES ('SS', 'co-workers');
+INSERT INTO incirc (owner_id, circle_name, p_id)
+VALUES ('SS', 'co-workers', 'SS');
+INSERT INTO incirc (owner_id, circle_name, p_id)
+VALUES ('SS', 'co-workers', 'BB');
+INSERT INTO incirc (owner_id, circle_name, p_id)
+VALUES ('SS', 'co-workers', 'MM');
+
+INSERT INTO circle (owner_id, circle_name)
+VALUES ('SS', 'family');
+INSERT INTO incirc (owner_id, circle_name, p_id)
+VALUES('SS', 'family', 'SS');
+INSERT INTO incirc (owner_id, circle_name, p_id)
+VALUES ('SS', 'family', 'AA');
+
+##5
+INSERT INTO content (c_id, c_text, privacy, owner_id)
+VALUES (2, 'Agenda for the meeting', 1, 'SS');
+INSERT INTO topic (c_id, topic)
+VALUES (2, 'Acme Project');
+INSERT INTO topic (c_id, topic)
+VALUES (2, 'group meeting');
+INSERT INTO visible (owner_id, circle_name, c_id)
+VALUES ('SS', 'co-workers', 2);
+
+##6
+INSERT INTO content (c_id, c_text, privacy, owner_id)
+VALUES (3, 'Went to a great restaurant last night', 1, 'SS');
+INSERT INTO topic (c_id, topic)
+VALUES (3, 'restaurants');
+INSERT INTO visible (owner_id, circle_name, c_id)
+VALUES ('SS', 'family', 3);
+
+######B
+
+##1. Find all type 0 content
+SELECT * 
+FROM content
+WHERE privacy =0;
+
+##2. Find all type 0 content with topic “restaurants”
+SELECT *
+FROM content, topic
+WHERE content.privacy = 0
+AND content.c_id = topic.c_id
+AND topic =  '%restaurants%';
+
+#3. Find average rating of content item 1
+SELECT AVG(rate.rate)
+FROM rate
+WHERE rate.c_id = 1;
+
+#4. Find the average rating of each content item with topic “restaurants”.
+select avg(rate)
+from topic
+natural join rate
+where  topic="%restaurants%"
+group by c_id
+
+#5. Find all type 1 content visible to the user who’s p_id is ‘BB’
+SELECT *
+FROM content
+NATURAL JOIN visible
+NATURAL JOIN incirc
+WHERE privacy = 1 AND owner_id = 'BB';
+
+
+#6. Find all type 1 content about restaurants that is the user who’s p_id is ‘BB’
+SELECT *
+FROM content
+NATURAL JOIN topic 
+NATURAL JOIN visible 
+NATURAL JOIN incirc 
+WHERE privacy = 1 
+AND p_id = 'BB' 
+AND topic = 'restaurant';

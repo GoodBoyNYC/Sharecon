@@ -1,0 +1,35 @@
+Llubomir Stanojlovic
+0351271
+queries
+
+Login:
+	select p_id, password from person where p_id = ? and password = ?
+View public content:
+	select distinct content.c_id, c_text, owner_id, rate from content natural join rate where privacy=0
+View content only the logged in can see:
+	Select distinct content.c_id, c_text, owner_id, rate From content Inner Join rate where owner_id = ? and rate>=0
+View topic logged in:
+	Select Distinct topic from topic natural join content where owner_id = ? or privacy = 0
+View topic public:
+	Select Distinct topic from topic natural join content where privacy = 0
+Average rating of content:
+	SELECT c_id, AVG(rate) FROM rate natural join content WHERE owner_id = ? or privacy = 0 GROUP BY c_id
+View topic of choice with ratings for logged in user:
+	Select c_id, topic, c_text, privacy, owner_id, rate from topic natural join content natural join rate where owner_id = ?  and topic = ?
+View topic of choice with ratings publicly:
+	Select c_id, topic, c_text, privacy, owner_id, rate from topic natural join content natural join rate where privacy = 0 and topic = ?
+Rating: Insert a new rating or update if one already exists.
+	insert into rate (p_id, c_id, rate) values(?, ?, ?) on duplicate key update rate=?
+Post an Item with privacy=? and no topic chosen:
+	insert into content (c_id, c_text, privacy, owner_id, p_time) values (?, ?, ?, ?, NOW())
+	INSERT INTO topic (c_id, topic) VALUES (?, ?)
+Post an Item with privacy=? and a topic chosen:
+	insert into content (c_id, c_text, privacy, owner_id, p_time) values (?, ?, 1, ?, NOW())
+	INSERT INTO topic (c_id, topic) VALUES (?, ?)	
+	INSERT INTO visible (owner_id, circle_name, c_id) VALUES (?, ?, ?)
+Create new circle:
+	insert into circle (owner_id, circle_name, description) values (?, ?, ?)
+Add owner of circle as a part of the circle:
+	insert into incirc (owner_id, circle_name, p_id) values (?, ?, ?)
+Add an existing user into an existing circle:
+	insert into incirc (owner_id, circle_name, p_id) values (?, ?, ?)
